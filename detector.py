@@ -75,14 +75,16 @@ def decode_detections(
 
     boxes = []
     for cls_idx in range(heatmap.shape[0]):
+        if len(boxes) >= max_detections:
+            break
         ys, xs = torch.where(peaks[cls_idx])
         for y_t, x_t in zip(ys.tolist(), xs.tolist()):
             score = heatmap[cls_idx, y_t, x_t].item()
             ox = offset[0, y_t, x_t].item()
             oy = offset[1, y_t, x_t].item()
             # Convert pixel + sub-pixel offset to metric BEV coordinates
-            cx = (x_t + ox - bev_size / 2) * bev_resolution
-            cy = (y_t + oy - bev_size / 2) * bev_resolution
+            cx = (x_t + ox) * bev_resolution - bev_range
+            cy = (y_t + oy) * bev_resolution - bev_range
             cz = height[0, y_t, x_t].item()
             w = abs(size[0, y_t, x_t].item())
             l = abs(size[1, y_t, x_t].item())

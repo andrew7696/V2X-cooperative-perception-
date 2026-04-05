@@ -36,8 +36,12 @@ def test_gradients_flow():
 
 
 def test_solo_mode():
-    """FusionNeck in solo mode should process only feat_b (feat_a=None)."""
+    """FusionNeck in solo mode should process only feat_b (feat_a=None) and produce finite, deterministic output."""
     neck = FusionNeck(in_channels_each=BEV_OUT_CHANNELS, out_channels=BEV_OUT_CHANNELS)
+    neck.eval()
     feat_b = make_feat()
-    out = neck(feat_b, feat_a=None)
-    assert out.shape == (1, BEV_OUT_CHANNELS, BEV_SIZE, BEV_SIZE)
+    out1 = neck(feat_b, feat_a=None)
+    out2 = neck(feat_b, feat_a=None)
+    assert out1.shape == (1, BEV_OUT_CHANNELS, BEV_SIZE, BEV_SIZE)
+    assert torch.isfinite(out1).all(), "solo mode output must not contain NaN/Inf"
+    assert torch.allclose(out1, out2), "solo mode must be deterministic"

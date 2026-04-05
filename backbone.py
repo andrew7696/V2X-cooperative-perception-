@@ -78,7 +78,7 @@ class BEVEncoder(nn.Module):
 
         intensity_sum = np.zeros(sz, dtype=np.float32)
         np.add.at(intensity_sum, flat, pts[:, 3])
-        count = density.copy()
+        count = density
         valid = count > 0
         intensity_sum[valid] /= count[valid]
         bev[3] = intensity_sum.reshape(BEV_SIZE, BEV_SIZE)

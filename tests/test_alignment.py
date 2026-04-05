@@ -45,7 +45,9 @@ def test_pure_translation_shifts_spike():
     expected_x = c + int(-20.0 / BEV_RESOLUTION)
     max_idx = out[0, 0].argmax()
     max_x = (max_idx % BEV_SIZE).item()
+    max_y = (max_idx // BEV_SIZE).item()
     assert abs(max_x - expected_x) <= 3   # 3-pixel tolerance for bilinear
+    assert abs(max_y - c) <= 3            # y should not shift (pure x-translation)
 
 
 def test_zero_heading_diff_no_rotation():

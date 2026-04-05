@@ -41,7 +41,7 @@ def main():
     backbone = BEVEncoder()
     backbone.eval()
 
-    v2x = V2XChannel(compression_ratio=args.compression_ratio)
+    v2x = V2XChannel(compression_ratio=args.compression_ratio)  # plain class, no .eval() needed
     fusion = FusionNeck()
     fusion.eval()
     detector = DetectionHead()
@@ -117,6 +117,10 @@ def main():
         env.close()
 
     # Summary
+    if not solo_recalls:
+        print("No ticks completed — no metrics to report.")
+        return
+
     avg_solo_recall = sum(solo_recalls) / len(solo_recalls)
     avg_coop_recall = sum(coop_recalls) / len(coop_recalls)
     avg_solo_prec = sum(solo_precisions) / len(solo_precisions)

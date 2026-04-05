@@ -166,7 +166,7 @@ class CARLAEnv:
             cls = 0 if 'walker' in actor.type_id else 1
             gt.append({
                 'x': local_x, 'y': local_y, 'z': loc.z,
-                'w': bb.extent.x * 2, 'l': bb.extent.y * 2, 'h': bb.extent.z * 2,
+                'w': bb.extent.y * 2, 'l': bb.extent.x * 2, 'h': bb.extent.z * 2,
                 'class': cls, 'score': 1.0,
             })
         return gt
@@ -189,7 +189,6 @@ class CARLAEnv:
             }
         """
         self.world.tick()
-        time.sleep(0.05)
 
         return {
             'lidar_a': self._lidar_a,

@@ -1,4 +1,5 @@
 import torch
+import torch.nn.functional as F
 import pytest
 from backbone import BEV_OUT_CHANNELS, BEV_SIZE
 from compressor import FeatureCompressor
@@ -31,11 +32,15 @@ def test_decompress_restores_size():
 
 
 def test_quantize_clips_range():
+    """Quantization should clamp values and the max absolute value should not exceed the input range."""
     comp = FeatureCompressor(compression_ratio=2, quantize=True)
     feat = make_feat() * 100  # large values
     out = comp.compress(feat)
-    # After quantization the max absolute value should equal original max (scaled back)
     assert torch.isfinite(out).all()
+    # Max absolute value of output must not exceed max absolute value of the compressed (pre-quant) input
+    # (quantization never amplifies values)
+    unquantized = F.avg_pool2d(feat, kernel_size=2, stride=2)
+    assert out.abs().max().item() <= unquantized.abs().max().item() + 1e-4
 
 
 def test_no_quantize_is_differentiable():
